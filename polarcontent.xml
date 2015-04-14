@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="3.1" type="plugin" group="content">
+	<name>plg_content_polarchess</name>
+	<author>Odd Gunnar Malin</author>
+	<creationDate>Januar 2015</creationDate>
+	<copyright>Copyright (C) 2015.</copyright>
+	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+	<authorEmail>oddg@sjakk.biz</authorEmail>
+	<authorUrl>polarchess.net</authorUrl>
+	<version>1.0.0</version>
+	<description>PLG_CONTENT_POLARCHESS_XML_DESCRIPTION</description>
+	<files>
+		<filename plugin="polarchess">polarchess.php</filename>
+		<folder>language</folder>
+	</files>
+	<media>
+		<folder>polarchess</folder>
+	</media>
+	<languages folder="language">
+		<language tag="en-GB">en-GB/en-GB.plg_content_polarchess.ini</language>
+		<language tag="en-GB">en-GB/en-GB.plg_content_polarchess.sys.ini</language>
+		<language tag="nb-NO">nb-NO/nb-NO.plg_content_polarchess.ini</language>
+		<language tag="nb-NO">nb-NO/nb-NO.plg_content_polarchess.sys.ini</language>
+	</languages>
+	<config>
+		<fields name="params">
+			<fieldset name="basic">
+				<field name="diagram"
+					type="radio"
+					class="btn-group btn-group-yesno"
+					default="1"
+					description="PLG_CONTENT_POLARCHESS_FEN_DESC"
+					label="PLG_CONTENT_POLARCHESS_FEN_LABEL"
+				>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+			</fieldset>
+		</fields>
+	</config>
+</extension>
