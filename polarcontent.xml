@@ -8,14 +8,14 @@
 	<authorEmail>oddg@sjakk.biz</authorEmail>
 	<authorUrl>polarchess.net</authorUrl>
 	<version>1.0.0</version>
-	<description>PLG_CONTENT_POLARCHESS_XML_DESCRIPTION</description>
+	<description>PLG_CONTENT_POLARCONTENT_XML_DESCRIPTION</description>
 	<files>
 		<filename plugin="polarcontent">polarcontent.php</filename>
 		<folder>helpers</folder>
 		<folder>language</folder>
 	</files>
 	<media>
-		<folder>polarcontent</folder>
+		<folder destination="polarcontent" folder="media">polarcontent</folder>
 	</media>
 	<languages folder="language">
 		<language tag="en-GB">en-GB/en-GB.plg_content_polarcontent.ini</language>
