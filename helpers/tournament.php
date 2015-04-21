@@ -2,6 +2,12 @@
 
 defined('_JEXEC') or die;
 
+/**
+ * Compare routine for usort()
+ * @param mixed $a
+ * @param mixed $b
+ * @return -1 0 1
+ */
 function ScoreCompare($a,$b)
 {
 	if ($a[4] == $b[4])
@@ -38,13 +44,18 @@ class TournamentHelper
 	protected $result;
 	protected $score;
 	
+	/**
+	 * 
+	 * @param		string $line	Line to be konverted [tour attr]Headline[/tour] 
+	 * @return	string 				Table to be displayed
+	 */
 	public function makeTournament($line)
 	{
 		$table="";
 		$this->tournament=null;
 		$this->player=null;
 		$this->result=null;
-		if (!$this->_getParametre($tid,$round,$type,$head,$line))
+		if (!$this->_getParametre($tid,$round,$type,$xtable,$head,$line))
 			return '** PolarTour Parametre error **';
 //		echo "<pre>";var_dump(array($tid,$round,$type,$head));echo "</pre>";
 		if (!$tid)
@@ -63,11 +74,21 @@ class TournamentHelper
 			$table.="<caption>$head</caption>\n";
 		$table.="<thead>\n";
 		$table.="<tr>\n";
-		$table.="<th>Pl.</th>\n";
-		$table.="<th>Navn</th>\n";
-		for ($i=1;$i<=$round;$i++)
-			$table.="<th>$i</th>\n";
-		$table.="<th>Poeng</th>\n";
+		$table.="<th class='polartour_number'>Pl.</th>\n";
+		$table.="<th class='polartour_name'>Navn</th>\n";
+		if ($xtable)
+		{
+			if ($this->tournament['tournamenttype']>4)
+			{
+				for ($i=1;$i<=count($this->score);$i++)
+					$table.="<th class='polartour_xtable'>$i</th>\n";
+			}else 
+			{
+				for ($i=1;$i<=$round;$i++)
+					$table.="<th class='polartour_xtable'>$i</th>\n";
+			}
+		}
+		$table.="<th class='polartour_score'>Poeng</th>\n";
 		$table.="</tr>\n";
 		$table.="</thead>\n";
 		$table.="<tbody>\n";
@@ -75,11 +96,21 @@ class TournamentHelper
 		foreach ($this->score as $s)
 		{
 			$table.="<tr class=$class>\n";
-			$table.="<td>{$s[0]}</td>\n";
-			$table.="<td>{$s[2]} {$s[3]}</td>\n";			
-			for ($i=1;$i<=$round;$i++)
-				$table.="<td>" . $this->_getRoundScore($i,$s[1],$round) . "</td>\n";
-			$table.="<td>{$s[4]}</td>\n";
+			$table.="<td class='polartour_number'>{$s[0]}</td>\n";
+			$table.="<td class='polartour_name'>{$s[2]} {$s[3]}</td>\n";
+			if ($xtable)
+			{
+				if ($this->tournament['tournamenttype']>4)
+				{
+					for ($i=1;$i<=count($this->score);$i++)
+						$table.="<td class='polartour_xtable'>" . "&nbsp;" . "</td>\n";
+				}else
+				{
+					for ($i=1;$i<=$round;$i++)
+						$table.="<td class='polartour_xtable'>" . $this->_getRoundScore($i,$s[1],$round) . "</td>\n";
+				}
+			}
+			$table.="<td class='polartour_score'>{$s[4]}</td>\n";
 			$table.="</tr>\n";
 			$class=($class=='polartour_tbody_tr_odd')?'polartour_tbody_tr_even':'polartour_tbody_tr_odd';
 		}
@@ -90,9 +121,9 @@ class TournamentHelper
 
 	/**
 	 * 
-	 * @param int $r Round
-	 * @param int $p Player
-	 * @param int $rounds Number of rounds
+	 * @param integer $r Round
+	 * @param integer $p Player
+	 * @param integer $rounds Number of rounds
 	 */
 	protected function _getRoundScore($r,$p,$rounds)
 	{
@@ -104,23 +135,45 @@ class TournamentHelper
 		{
 			if ($this->score[$i][1]==$p)
 			{
-				if ($this->score[$i][0+$r+$rounds*2]=='')
+				if ((!isset($this->score[$i][9+$r+$rounds*2])) || ($this->score[$i][9+$r+$rounds*2]==''))
 					return $ret; 
 				$ret='';
+				if (($this->tournament['showcolor']==1) && ($this->score[$i][9+$r+$rounds*2]=='w'))
+					$ret.="<b>";
 				if ($this->score[$i][9+$r]==0)
 					$ret.='-';
 				elseif ($this->score[$i][9+$r]==1)
 					$ret.='+';
 				else 
 					$ret.='=';
+				if ($this->score[$i][9+$r+$rounds]==0)
+				{
+					if ($this->score[$i][9+$r+$rounds*2]=='f')
+						$ret.='F';
+					else
+						$ret.='W';
+					
+				}else
+				{
+					$k=count($this->score);
+					for ($j=0;$j<$k;$j++)
+					{
+						if ($this->score[$j][1]==$this->score[$i][9+$r+$rounds])
+							$ret.=($k>9)?sprintf("%02d",$j+1):sprintf("%d",$j+1);
+					}
+				}
+				if (($this->tournament['showcolor']==1) && ($this->score[$i][9+$r+$rounds*2]==''))
+					$ret.="</b>";
 				return $ret;
 			}
 		}
 		
 		return $ret;
 	}
+	
 	/**
 	 * 
+	 * @return integer Last round with result
 	 */
 	protected function _getLastRound()
 	{
@@ -135,18 +188,20 @@ class TournamentHelper
 	
 	/**
 	 * 
-	 * @param int			$tid		Tournament id
-	 * @param int			$round	Round number
-	 * @param int			$type		Table type
+	 * @param integer	$tid		Tournament id
+	 * @param integer	$round	Round number
+	 * @param integer	$type		Table type
+	 * @param integer	$xtable	Show pm/xtable
 	 * @param string	$head		Headline
 	 * @param string	$line		String to check
 	 */
-	protected function _getParametre(&$tid, &$round, &$type, &$head, $line)
+	protected function _getParametre(&$tid, &$round, &$type, &$xtable, &$head, $line)
 	{
 		// Defaults
 		$tid=0;
 		$round=99;
 		$type=1;
+		$xtable=1;
 		$head="";
 		$start=strpos($line,"[tour ",0);
 		if ($start===false)
@@ -184,6 +239,12 @@ class TournamentHelper
 				$end=strpos($attr,"\"",$start);
 				if ($end!==false)
 					$type=substr($attr,$start,$end-$start);
+			}else if (substr($attr,$start,8)==' xtable=')
+			{
+				$start+=9;
+				$end=strpos($attr,"\"",$start);
+				if ($end!==false)
+					$xtable=substr($attr,$start,$end-$start);
 			}else
 			{
 				++$start;
@@ -192,6 +253,17 @@ class TournamentHelper
 		return true;
 	}
 	
+	/**
+	 * 
+	 * @param integer $round Round to make the score table for
+	 * @return Update $this->score
+	 * 
+	 * $this->score
+	 * (col 0-9)
+	 * Number;Player id;First name;Last name;Score;Tb1;Tb2;Tb3;Tb4;Tb5;
+	 * (col 10-n)
+	 * Point round 1;...;Opponent id round 1;...;Color(w/b) or f round 1;...;
+	 */
 	protected function _calcResult($round){
 		$this->score=array();
 		
@@ -212,6 +284,10 @@ class TournamentHelper
 				$skip=false;
 				switch ($r['result'])
 				{
+					case -1:
+						$ws=$r['whitescore'];
+						$bs=$r['blackscore'];
+						break;
 					case 0:  // Ongoing
 						$skip=true;
 						break;
@@ -252,7 +328,7 @@ class TournamentHelper
 					{
 						$this->score[$i][4]+=$bs;
 						$this->score[$i][9+$r['round']]=$bs;
-						$this->score[$i][9+$r['round']+$round]=$bp;
+						$this->score[$i][9+$r['round']+$round]=$wp;
 						if ($r['result']>3)
 							$this->score[$i][9+$r['round']+$round*2]='f';
 						else
@@ -296,6 +372,11 @@ class TournamentHelper
 //		echo "<pre>";var_dump($this->score);echo "</pre>";
 	}
 	
+	/**
+	 * 
+	 * @param		integer $tid Id for tournament to be loaded
+	 * @return	boolean       
+	 */
 	protected function _loadData($tid)
 	{
 		$db=JFactory::getDbo();
@@ -304,7 +385,6 @@ class TournamentHelper
 		$query->select('*');
 		$query->from('#__polartour_tournament');
 		$query->where('id='.$tid);
-		$query->where('trashed=0');
 //		var_dump($query); return;
 		$db->setQuery($query);		
 		if (!$db->execute())
@@ -315,7 +395,6 @@ class TournamentHelper
 		$query->select('*');
 		$query->from('#__polartour_player');
 		$query->where('tournamentid='.$tid);
-		$query->where('trashed=0');
 		$db->setQuery($query);
 		if ($db->execute())
 			$this->player=$db->loadAssocList();
@@ -324,7 +403,6 @@ class TournamentHelper
 		$query->select('*');
 		$query->from('#__polartour_result');
 		$query->where('tournamentid='.$tid);
-		$query->where('trashed=0');
 		$db->setQuery($query);
 		if ($db->execute())
 			$this->result=$db->loadAssocList();
