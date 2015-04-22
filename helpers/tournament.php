@@ -93,6 +93,7 @@ class TournamentHelper
 		$table.="</thead>\n";
 		$table.="<tbody>\n";
 		$class='polartour_tbody_tr_odd';
+		
 		foreach ($this->score as $s)
 		{
 			$table.="<tr class=$class>\n";
@@ -102,8 +103,8 @@ class TournamentHelper
 			{
 				if ($this->tournament['tournamenttype']>4)
 				{
-					for ($i=1;$i<=count($this->score);$i++)
-						$table.="<td class='polartour_xtable'>" . "&nbsp;" . "</td>\n";
+					for ($i=0;$i<count($this->score);$i++)
+						$table.="<td class='polartour_xtable'>" . $this->_getRoundRobinScore($this->score[$i][1],$s[1],$round) . "</td>\n";
 				}else
 				{
 					for ($i=1;$i<=$round;$i++)
@@ -119,6 +120,68 @@ class TournamentHelper
 		return $table;
 	}
 
+	/**
+ 	* 
+ 	* @param integer $o	Opponent number
+ 	* @param integer $p	Player id
+ 	* @param integer $r	Number of rounds
+ 	* @return string String to put into the xtable
+ 	*/
+	protected function _getRoundRobinScore($oid, $pid, $r)
+	{
+		$ret='';
+		if ($oid==$pid)
+		{
+			if ($this->tournament['tournamenttype']==4)
+				return '*';
+			else if ($this->tournament['tournamenttype']==5)
+				return '**';
+			else if ($this->tournament['tournamenttype']==6)
+				return '***';
+			return '****';
+		}
+		for ($i=0;$i<count($this->score);$i++)
+		{
+			if ($this->score[$i][1]==$pid)
+			{
+				for ($j=10;$j<(10+$r);$j++)
+				{
+					if ($oid==$this->score[$i][$j+$r])
+					{
+						if (($this->tournament['showcolor']==1) && ($this->score[$i][$j+$r*2]=='w'))
+							$ret.="<b>";
+						if ($this->score[$i][$j]==1)
+							$ret.='1';
+						else if ($this->score[$i][$j]==0)
+							$ret.='0';
+						else
+							$ret.='&frac12;';
+						if (($this->tournament['showcolor']==1) && ($this->score[$i][$j+$r*2]=='w'))
+							$ret.="</b>";
+					}
+				}
+			}
+		}
+		if (strlen($ret)<1)
+			$ret="&nbsp";
+		if ($this->tournament['tournamenttype']>4)
+		{
+			if (strlen($ret)<2)
+				$ret.="&nbsp";
+			if ($this->tournament['tournamenttype']>5)
+			{
+				if (strlen($ret)<3)
+					$ret.="&nbsp";
+				if ($this->tournament['tournamenttype']>6)
+				{
+					if (strlen($ret)<4)
+						$ret.="&nbsp";
+				}
+			}
+		}
+		return $ret;
+	}
+	
 	/**
 	 * 
 	 * @param integer $r Round
