@@ -4,4 +4,4 @@ del polarcontent.zip
 ..\7z a -Y polarcontent.zip *.xml
 ..\7z a -Y polarcontent.zip helpers
 ..\7z a -Y polarcontent.zip language
-..\7z a -Y polarcontent.zip polarcontent
+..\7z a -Y polarcontent.zip media
