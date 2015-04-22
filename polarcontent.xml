@@ -14,7 +14,7 @@
 		<folder>helpers</folder>
 		<folder>language</folder>
 	</files>
-	<media destination="polarcontent" folder="media/polarcontent">
+	<media destination="polarcontent" folder="media">
 		<folder>img</folder>
 	</media>
 	<languages folder="language">
