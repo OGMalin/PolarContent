@@ -29,13 +29,16 @@ class plgContentPolarcontent extends JPlugin
 		}
 		if ($this->params->get('tournament')==1)
 		{
+			$document = JFactory::getDocument();
+			$cssFile="./media/polarcontent/css/template.css";
+			$document->addStyleSheet($cssFile);
 			$start=0;
 			while (($start=strpos($article->text,"[tour",$start))!==false)
 			{
 				$end=strpos($article->text,'[/tour]',$start);
 				if ($end===false)
 					break;
-				$tour=new TournamentHelper();
+				$tour=new TournamentContentHelper();
 				$tournament=$tour->makeTournament(substr($article->text,$start,$end-$start+7));
 				$article->text=substr_replace($article->text,$tournament,$start,$end-$start+7);
 				$start+=strlen($tournament);

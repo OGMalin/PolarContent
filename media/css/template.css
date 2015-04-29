@@ -1,0 +1,45 @@
+table.polartour_table {
+	padding: 3px;
+	background-color: blue;
+	border: 1px solid white;
+	padding: 0px;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	font-size: 0.9em;
+}
+
+table.polartour_table > caption {
+	font-weight: bold;
+	text-align: left;
+}
+
+table.polartour_table > thead {
+	color: black;
+	font-weight: bold;	
+	text-shadow: 0px 1px 0px white;
+  #gradient > .vertical(white, gray);
+}
+
+table.polartour_table > tbody > tr > td {
+	padding-left: 5px;
+}
+
+.polartour_tbody_tr_odd {	
+}
+
+.polartour_tbody_tr_even {
+  background-color: #ddd;
+}
+
+table.polartour_table > tbody > tr > td.polartour_number{
+	text-align: right;
+}
+
+table.polartour_table > tbody > tr > td.polartour_score{
+	font-weight: bold;
+	text-align: center;
+}
+
+table.polartour_table > tbody > tr > td.polartour_xtable{
+	font-family: monospace;
+}
