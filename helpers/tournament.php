@@ -2,7 +2,7 @@
 
 defined('_JEXEC') or die;
 
-require_once './components/com_polartour/helpers/tournament.php';
+require_once JPATH_SITE .'/components/com_polartour/helpers/tournament.php';
 
 class TournamentContentHelper
 {
