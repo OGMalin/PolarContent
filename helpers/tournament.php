@@ -120,8 +120,6 @@ class TournamentContentHelper
 		$query->where('id='.$tid);
 //		var_dump($query); return;
 		$db->setQuery($query);		
-		if (!$db->execute())
-			return false;
 		$this->tournament=$db->loadAssoc();
 		
 		$query=$db->getQuery(true);
@@ -129,16 +127,14 @@ class TournamentContentHelper
 		$query->from('#__polartour_player');
 		$query->where('tournamentid='.$tid);
 		$db->setQuery($query);
-		if ($db->execute())
-			$this->player=$db->loadAssocList();
+		$this->player=$db->loadAssocList();
 		
 		$query=$db->getQuery(true);
 		$query->select('*');
 		$query->from('#__polartour_result');
 		$query->where('tournamentid='.$tid);
 		$db->setQuery($query);
-		if ($db->execute())
-			$this->result=$db->loadAssocList();
+		$this->result=$db->loadAssocList();
 		return true;
 	}
 }
