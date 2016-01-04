@@ -26,12 +26,16 @@ class TournamentContentHelper
 		if (!$tid)
 			return '** PolarTour tournament id missing **';
 		if (!$this->_loadData($tid))
-			return '** PolarTour Load data error **';
+			return '--';
 		
 		$tour->tournament=$this->tournament;
 		$tour->player=$this->player;
 		$tour->result=$this->result;
-		$tour->head=$head;
+//		echo "<pre>";var_dump($this->tournament);echo "</pre>";
+		if ($this->tournament['state']==0)
+			$tour->head="<span class='label label-warning'>Upublisert</span> " . $head;
+		else
+			$tour->head=$head;
 		
 		if ($xtable==1)
 			$table=$tour->displayTable($round);
@@ -113,15 +117,23 @@ class TournamentContentHelper
 	protected function _loadData($tid)
 	{
 		$db=JFactory::getDbo();
+		$user	= JFactory::getUser();
+		$canEdit = $user->authorise('core.edit', 'com_polartour');
 		
 		$query=$db->getQuery(true);
 		$query->select('*');
 		$query->from('#__polartour_tournament');
 		$query->where('id='.$tid);
+		if ($canEdit)
+			$query->where('(state IN (0, 1, 2))');
+		else
+			$query->where('(state IN (1, 2))');
 //		var_dump($query); return;
-		$db->setQuery($query);		
-		$this->tournament=$db->loadAssoc();
-		
+		$db->setQuery($query);
+ 		$this->tournament=$db->loadAssoc();
+ 		if ($this->tournament==NULL)
+ 			return false;
+//		echo "<pre>"; var_dump($this->tournament); echo "</pre>";		
 		$query=$db->getQuery(true);
 		$query->select('*');
 		$query->from('#__polartour_player');
