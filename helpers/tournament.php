@@ -138,6 +138,7 @@ class TournamentContentHelper
 		$query->select('*');
 		$query->from('#__polartour_player');
 		$query->where('tournamentid='.$tid);
+//		$query->order("startnr desc");
 		$db->setQuery($query);
 		$this->player=$db->loadAssocList();
 		
