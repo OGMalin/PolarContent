@@ -2,6 +2,81 @@
 
 defined('_JEXEC') or die;
 
+function diagramImage($line)
+{
+	// Make a filename based on MD5.en
+	// board+size+color+inverted
+
+	$diagram='';
+	$tomove='';
+	$class='';
+	$inverted=0;
+	$size=30;
+	$board='';
+	
+	$start=strpos($line,"[fen ",0);
+	if ($start===false)
+		return "<img src='error.png' />";
+	$end=strpos($line,"]",$start);
+	if ($end===false)
+		return "<img src='error.png' />";
+
+	$attr=substr($line,$start,$end-$start);
+	$start=$end+1;
+	$end=strpos($line,"[/fen]",$start);
+	if ($end===false)
+		return "<img src='error.png' />";
+	$fen=substr($line,$start,$end-$start);
+
+	$len=strpos($fen," ");
+	if ($len===false)
+		$board=$fen;
+	else 
+		$board=substr($fen,0,$len);
+	
+	if (strpos($fen," w")!==false)
+		$tomove="w";
+	else if (strpos($fen," b")!==false)
+		$tomove="b";
+
+	$start=0;
+	while (($start=strpos($attr,' ',$start))!==false)
+	{
+		if (substr($attr,$start,6)==' size=')
+		{
+			$start+=7;
+			$end=strpos($attr,"\"",$start);
+			if ($end!==false)
+				$size=substr($attr,$start,$end-$start);
+		}else if (substr($attr,$start,6)==' text=')
+		{
+			$start+=7;
+			$end=strpos($attr,"\"",$start);
+			if ($end!==false)
+				$text=substr($attr,$start,$end-$start);
+		}else if (substr($attr,$start,7)==' class=')
+		{
+			$start+=8;
+			$end=strpos($attr,"\"",$start);
+			if ($end!==false)
+				$class=substr($attr,$start,$end-$start);
+		}else if (substr($attr,$start,8)==' invert=')
+		{
+			$start+=9;
+			$end=strpos($attr,"\"",$start);
+			if ($end!==false)
+				$invert=substr($attr,$start,$end-$start);
+		}else
+		{
+			++$start;
+		}
+	}
+	$diagram=$diagramcache . md5($board.$size.$tomove.$inverted) . ".png";
+	
+	
+	return "<img src='$diagram' />";
+}
+
 function makeDiagram($line)
 {
 	// [fen size="35" text="this is a test" class="pull-left" invert="0"]r4nk1/1qn1rppp/b1p1p3/2PpP1N1/3P2NP/1p4PB/1P3P2/RQ2R1K1 w[/fen]
